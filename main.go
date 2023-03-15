@@ -5,11 +5,19 @@ import (
 	"net/http"
 )
 
-func main() {
-	resp, err := http.Get("https://wttr.in")
-	if err != nil {
-		fmt.Printf("got an error, %v", err)
+func hello(writer http.ResponseWriter, requester *http.Request) {
+	fmt.Fprintf(writer, "hello\n")
+}
+
+func headers(writer http.ResponseWriter, requester *http.Request) {
+	for name, headers := range requester.Header {
+		for _, h := range headers {
+			fmt.Fprintf(writer, "%v: %v\n", name, h)
+		}
 	}
-	defer resp.Body.Close()
-	fmt.Println(resp.ContentLength)
+}
+
+func post() {
+	http.HandleFunc("/headers", headers)
+	http.ListenAndServe(":8090", nil)
 }
