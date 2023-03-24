@@ -5,19 +5,20 @@ import (
 	"net/http"
 )
 
-func hello(writer http.ResponseWriter, requester *http.Request) {
-	fmt.Fprintf(writer, "hello\n")
+func main() {
+	initialize()
+	http.ListenAndServe(":8080", nil)
 }
 
-func headers(writer http.ResponseWriter, requester *http.Request) {
-	for name, headers := range requester.Header {
-		for _, h := range headers {
-			fmt.Fprintf(writer, "%v: %v\n", name, h)
-		}
-	}
+type api struct {
+	input string
+	port  string
 }
 
-func post() {
-	http.HandleFunc("/headers", headers)
-	http.ListenAndServe(":8090", nil)
+func initialize() {
+	fmt.Println("initializing api")
 }
+
+func (api api) get() {}
+
+func (api api) post() {}
