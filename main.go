@@ -1,21 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
 )
-
-type Stuff struct {
-	things []string
-}
 
 type Controller struct {
 	path *regexp.Regexp
 }
 
+var (
+	stuff []string
+)
+
 func main() {
 	RegisterControllers()
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":3000", nil)
 }
 
 func (c Controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -35,17 +36,28 @@ func (c Controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c Controller) Get(w http.ResponseWriter, r *http.Request)  {}
-func (c Controller) Post(w http.ResponseWriter, r *http.Request) {}
-func (c Controller) Put(w http.ResponseWriter, r *http.Request)  {}
+func (c Controller) Get(w http.ResponseWriter, r *http.Request) {}
+func (c Controller) Post(w http.ResponseWriter, r *http.Request) {
+	dec := json.NewDecoder(r.Body)
+	var things []string
+	err := dec.Decode(&things)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	for _, thing := range things {
+		stuff = append(stuff, thing)
+	}
+}
+func (c Controller) Put(w http.ResponseWriter, r *http.Request) {}
 
-func newController() *Controller {
+func newAPIController() *Controller {
 	return &Controller{
 		path: regexp.MustCompile(`^/api`),
 	}
 }
 
 func RegisterControllers() {
-	c := newController()
+	c := newAPIController()
 	http.Handle("/api", c)
 }
