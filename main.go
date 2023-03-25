@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+
+	"golang.org/x/exp/slices"
 )
 
 type Controller struct {
@@ -11,7 +13,7 @@ type Controller struct {
 }
 
 var (
-	stuff []string
+	stuffs []string
 )
 
 func main() {
@@ -19,25 +21,9 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 }
 
-func (c Controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/api" {
-		switch r.Method {
-		case http.MethodGet:
-			c.Get(w, r)
-		case http.MethodPost:
-			c.Post(w, r)
-		case http.MethodPut:
-			c.Put(w, r)
-		default:
-			w.WriteHeader(http.StatusNotImplemented)
-		}
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-}
+func Get(w http.ResponseWriter, r *http.Request) {}
 
-func (c Controller) Get(w http.ResponseWriter, r *http.Request) {}
-func (c Controller) Post(w http.ResponseWriter, r *http.Request) {
+func Post(w http.ResponseWriter, r *http.Request) {
 	dec := json.NewDecoder(r.Body)
 	var things []string
 	err := dec.Decode(&things)
@@ -47,7 +33,8 @@ func (c Controller) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	AddStuff(things)
 }
-func (c Controller) Put(w http.ResponseWriter, r *http.Request) {}
+
+func Put(w http.ResponseWriter, r *http.Request) {}
 
 func newAPIController() *Controller {
 	return &Controller{
@@ -56,12 +43,37 @@ func newAPIController() *Controller {
 }
 
 func RegisterControllers() {
-	c := newAPIController()
-	http.Handle("/api", c)
+	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api" {
+			switch r.Method {
+			case http.MethodGet:
+				Get(w, r)
+			case http.MethodPost:
+				Post(w, r)
+			case http.MethodPut:
+				Put(w, r)
+			default:
+				w.WriteHeader(http.StatusNotImplemented)
+			}
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
 }
 
 func AddStuff(things []string) {
 	for _, thing := range things {
-		stuff = append(stuff, thing)
+		stuffs = append(stuffs, thing)
 	}
+}
+
+func StripStuffDupes(things []string) (sanitizedThings []string) {
+	for _, thing := range things {
+		if slices.Contains(things, thing) {
+			return
+		} else {
+			sanitizedThings = append(sanitizedThings, thing)
+		}
+	}
+	return
 }
