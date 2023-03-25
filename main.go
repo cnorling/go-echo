@@ -45,9 +45,7 @@ func (c Controller) Post(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	for _, thing := range things {
-		stuff = append(stuff, thing)
-	}
+	AddStuff(things)
 }
 func (c Controller) Put(w http.ResponseWriter, r *http.Request) {}
 
@@ -60,4 +58,10 @@ func newAPIController() *Controller {
 func RegisterControllers() {
 	c := newAPIController()
 	http.Handle("/api", c)
+}
+
+func AddStuff(things []string) {
+	for _, thing := range things {
+		stuff = append(stuff, thing)
+	}
 }
