@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -10,11 +11,13 @@ import (
 
 var (
 	stuffs []string
+	port   string = ":3000"
 )
 
 func main() {
 	http.HandleFunc("/api", APIController)
-	http.ListenAndServe(":3000", nil)
+	fmt.Printf("API initialized. listening on %v...", port)
+	http.ListenAndServe(port, nil)
 }
 
 func Get(w http.ResponseWriter) {
@@ -27,6 +30,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	err := dec.Decode(&things)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 		return
 	}
 	StuffAdd(things)
