@@ -17,7 +17,7 @@ var (
 )
 
 func main() {
-	RegisterControllers()
+	http.HandleFunc("/api", APIController)
 	http.ListenAndServe(":3000", nil)
 }
 
@@ -35,16 +35,6 @@ func Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func Put(w http.ResponseWriter, r *http.Request) {}
-
-func newAPIController() *Controller {
-	return &Controller{
-		path: regexp.MustCompile(`^/api`),
-	}
-}
-
-func RegisterControllers() {
-	http.HandleFunc("/api", APIController)
-}
 
 func APIController(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/api" {
