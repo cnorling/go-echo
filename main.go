@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"api/api"
+	"go-echo/api"
 )
 
 var (
