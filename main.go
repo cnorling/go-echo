@@ -31,7 +31,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	AddStuff(things)
+	StuffAdd(things)
 }
 
 func Put(w http.ResponseWriter, r *http.Request) {}
@@ -43,31 +43,33 @@ func newAPIController() *Controller {
 }
 
 func RegisterControllers() {
-	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/api" {
-			switch r.Method {
-			case http.MethodGet:
-				Get(w, r)
-			case http.MethodPost:
-				Post(w, r)
-			case http.MethodPut:
-				Put(w, r)
-			default:
-				w.WriteHeader(http.StatusNotImplemented)
-			}
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
-	})
+	http.HandleFunc("/api", APIController)
 }
 
-func AddStuff(things []string) {
+func APIController(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/api" {
+		switch r.Method {
+		case http.MethodGet:
+			Get(w, r)
+		case http.MethodPost:
+			Post(w, r)
+		case http.MethodPut:
+			Put(w, r)
+		default:
+			w.WriteHeader(http.StatusNotImplemented)
+		}
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
+func StuffAdd(things []string) {
 	for _, thing := range things {
 		stuffs = append(stuffs, thing)
 	}
 }
 
-func StripStuffDupes(things []string) (sanitizedThings []string) {
+func StuffStripDupes(things []string) (sanitizedThings []string) {
 	for _, thing := range things {
 		if slices.Contains(things, thing) {
 			return
