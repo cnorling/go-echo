@@ -76,8 +76,3 @@ func encode(data interface{}, w io.Writer) {
 	enc := json.NewEncoder(w)
 	enc.Encode(data)
 }
-
-func decode(data interface{}, r *http.Request) {
-	dec := json.NewDecoder(r.Body)
-	dec.Decode(&data)
-}
