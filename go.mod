@@ -1,4 +1,4 @@
-module go-echo
+module api
 
 go 1.20
 
