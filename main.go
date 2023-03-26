@@ -2,15 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
-	"regexp"
 
 	"golang.org/x/exp/slices"
 )
-
-type Controller struct {
-	path *regexp.Regexp
-}
 
 var (
 	stuffs []string
@@ -21,11 +17,13 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 }
 
-func Get(w http.ResponseWriter, r *http.Request) {}
+func Get(w http.ResponseWriter) {
+	encode(stuffs, w)
+}
 
 func Post(w http.ResponseWriter, r *http.Request) {
-	dec := json.NewDecoder(r.Body)
 	var things []string
+	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&things)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -40,7 +38,7 @@ func APIController(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/api" {
 		switch r.Method {
 		case http.MethodGet:
-			Get(w, r)
+			Get(w)
 		case http.MethodPost:
 			Post(w, r)
 		case http.MethodPut:
@@ -68,4 +66,14 @@ func StuffStripDupes(things []string) (sanitizedThings []string) {
 		}
 	}
 	return
+}
+
+func encode(data interface{}, w io.Writer) {
+	enc := json.NewEncoder(w)
+	enc.Encode(data)
+}
+
+func decode(data interface{}, r *http.Request) {
+	dec := json.NewDecoder(r.Body)
+	dec.Decode(&data)
 }
