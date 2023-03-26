@@ -11,8 +11,8 @@ RUN go mod download \
 FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
-COPY --from=build /app/api /api
+COPY --from=build /app/go-echo /go-echo
 
 EXPOSE 3000
 
-ENTRYPOINT ["/api"]
+ENTRYPOINT ["/go-echo"]
